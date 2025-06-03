@@ -16,5 +16,4 @@ variable "aws_access_key" {
 variable "aws_secret_key" {
   type        = string
   description = "AWS Secret Key"
-  sensitive   = true
 }

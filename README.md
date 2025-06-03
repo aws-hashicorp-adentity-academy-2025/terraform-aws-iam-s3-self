@@ -1,26 +1,36 @@
-# HCP Terraform 데모용 AWS S3 ReadOnly IAM 모듈
+# HCP Terraform Self-Service용 AWS S3 IAM 모듈
 
 ## 개요
 
-이 모듈은 HCP Terraform 데모 환경에서 사용할 AWS S3 읽기 전용(ReadOnly) 권한을 가진 IAM 사용자를 생성합니다. 
-Terraform을 통해 S3 리소스에 대한 읽기 권한만을 부여할 수 있도록 설계되었습니다.
+이 모듈은 HCP Terraform의 Self-Service 환경에서 사용자가 직접 AWS S3에 대한 IAM 사용자를 생성하고, 읽기(ReadOnly) 또는 읽기/쓰기(ReadWrite) 권한을 선택적으로 부여할 수 있도록 설계되었습니다.
 
 ## 사용 방법
 
 1. 이 모듈을 Terraform 구성에 포함시킵니다.
-2. 필요한 경우 변수 값을 수정하여 사용자의 이름 등을 커스터마이즈할 수 있습니다.
+2. 아래 변수들을 통해 사용자별로 필요한 권한과 이름(postfix)을 지정할 수 있습니다.
 
+### 입력 변수
+- `postfix` : IAM 사용자 이름 및 정책 이름에 붙는 식별자(예: 사용자별 고유값)
+- `policy_type` : 부여할 정책 유형 (`s3_readonly_policy` 또는 `s3_readwrite_policy`)
+- `aws_access_key` : AWS Access Key
+- `aws_secret_key` : AWS Secret Key
+
+### 예시
 ```hcl
-module "iam_s3_readonly" {
-  source = "./terraform_aws_iam_s3"
-  # 필요한 경우 변수 추가
+module "iam_s3_self" {
+  source      = "./terraform_aws_iam_s3_self"
+  postfix     = "user01"
+  policy_type = "s3_readonly_policy" # 또는 "s3_readwrite_policy"
+  aws_access_key = var.aws_access_key
+  aws_secret_key = var.aws_secret_key
 }
 ```
 
 ## 주요 기능
 
-- AWS S3 읽기 전용 IAM 사용자 생성
-- AmazonS3ReadOnlyAccess 정책 부여
+- Self-Service 환경에서 IAM 사용자 자동 생성
+- S3 읽기 전용 또는 읽기/쓰기 권한을 선택적으로 부여
+- 사용자별 postfix로 리소스 구분 가능
 
 ## 사전 조건
 
@@ -44,5 +54,5 @@ module "iam_s3_readonly" {
 
 ## 참고 사항
 
-- 이 모듈은 데모 및 테스트 용도로만 사용하시기 바랍니다.
+- 이 모듈은 HCP Terraform Self-Service 데모 및 테스트 용도로만 사용하시기 바랍니다.
 - 실제 운영 환경에서는 최소 권한 원칙(Least Privilege Principle)을 준수하여 권한을 설정하세요.
